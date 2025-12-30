@@ -1,0 +1,4172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2026 Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-gregorian: #000000;
+            --color-bangla: #1a9e36; /* Green */
+            --color-hijri: #004085; /* Darker Blue for contrast */
+            --color-weekend: #dc2626; /* Red */
+            --color-border: #d1d5db;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: white;
+            max-width: 210mm;
+            height: auto;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 8mm; 
+            color: #111;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 5px; 
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+        }
+        .header h1 {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            font-size: 22px; 
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: #333;
+        }
+        .header .subtext {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            font-size: 11px;
+            color: #555;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-weight: 500;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 6px; 
+            height: auto; 
+        }
+
+        .month-card {
+            border: 1px solid var(--color-border);
+            padding: 2px;
+            display: flex;
+            flex-direction: column;
+            page-break-inside: avoid; /* Prevent splitting */
+        }
+
+        .month-header {
+            text-align: center;
+            margin-bottom: 2px;
+            background: #f9fafb;
+            padding: 2px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .month-name-bn {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #111;
+            line-height: 1.1;
+        }
+        .month-name-en {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-top: -2px;
+        }
+        .sub-month-info {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            font-size: 8px;
+            color: #555;
+            margin-top: 1px;
+            display: flex;
+            flex-direction: column;
+            gap: 0px;
+        }
+        .sub-month-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            flex-grow: 1;
+        }
+        
+        th {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            font-weight: 600;
+            color: #444;
+            border-bottom: 1px solid var(--color-border);
+            padding: 1px 0;
+            font-size: 10px;
+        }
+        th.weekend { color: var(--color-weekend); }
+
+        td {
+            height: 100%;
+            vertical-align: top;
+            border: 1px solid #f0f0f0;
+            padding: 1px 2px;
+            position: relative;
+            height: 28px; 
+        }
+        
+        /* Date Cell Layout */
+        .date-cell {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        
+        .gregorian {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-gregorian);
+            line-height: 0.9;
+        }
+        
+        .secondary-dates {
+            display: flex;
+            justify-content: space-between;
+            font-size: 8px;
+            margin-top: 0px;
+            align-items: flex-end;
+        }
+        
+        .bangla-date { 
+            color: var(--color-bangla); 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+            font-weight: 600; 
+            font-size: 9px;
+        }
+        .hijri-date { 
+            color: var(--color-hijri); 
+            font-family: 'Inter', sans-serif; 
+            font-weight: 500;
+            font-size: 8px;
+        }
+
+        .weekend-text .gregorian { color: var(--color-weekend); }
+        .weekend-bg { background-color: #fef2f2; }
+
+        @media print {
+            body { 
+                padding: 0; 
+                margin: 10mm;
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>২০২৬ সালের ক্যালেন্ডার</h1>
+        <div class="subtext">
+            <span>বাংলা সন ১৪৩২–১৪৩৩</span>
+            <span>•</span>
+            <span>হিজরি সন ১৪৪৭–১৪৪৮</span>
+        </div>
+    </div>
+
+    <div class="calendar-grid">
+
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">জানুয়ারি</div>
+                <div class="month-name-en">January</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">পৌষ-মাঘ ১৪৩২</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">রজব-শাবান ১৪৪৭</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td></td><td></td><td></td><td></td>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">30</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">31</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">ফেব্রুয়ারি</div>
+                <div class="month-name-en">February</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">মাঘ-ফাল্গুন ১৪৩২</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">শাবান-রমজান ১৪৪৭</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">মার্চ</div>
+                <div class="month-name-en">March</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">ফাল্গুন-চৈত্র ১৪৩২</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">রমজান-শাওয়াল ১৪৪৭</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">30</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">31</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">এপ্রিল</div>
+                <div class="month-name-en">April</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">চৈত্র ১৪৩২ - বৈশাখ ১৪৩৩</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">শাওয়াল-জিলকদ ১৪৪৭</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td></td><td></td><td></td>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">মে</div>
+                <div class="month-name-en">May</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">বৈশাখ-জ্যৈষ্ঠ ১৪৩৩</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">জিলকদ-জিলহজ্জ ১৪৪৭</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td></td><td></td><td></td><td></td><td></td>
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩১</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">30</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">31</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">জুন</div>
+                <div class="month-name-en">June</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">জ্যৈষ্ঠ-আষাঢ় ১৪৩৩</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">জিলহজ্জ ১৪৪৭ - মহররম ১৪৪৮</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td></td>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩১</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">30</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">জুলাই</div>
+                <div class="month-name-en">July</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">আষাঢ়-শ্রাবণ ১৪৩৩</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">মহররম-সফর ১৪৪৮</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td></td><td></td><td></td>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩১</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">30</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">31</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">আগস্ট</div>
+                <div class="month-name-en">August</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">শ্রাবণ-ভাদ্র ১৪৩৩</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">সফর-রবিউল আউয়াল ১৪৪৮</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td></td><td></td><td></td><td></td><td></td><td></td>
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩১</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">31</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">সেপ্টেম্বর</div>
+                <div class="month-name-en">September</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">ভাদ্র-আশ্বিন ১৪৩৩</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">রবিউল আউয়াল-রবিউস সানি ১৪৪৮</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td></td><td></td>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">30</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩১</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">অক্টোবর</div>
+                <div class="month-name-en">October</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">আশ্বিন-কার্তিক ১৪৩৩</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">রবিউস সানি-জমাদিউল আউয়াল ১৪৪৮</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td></td><td></td><td></td><td></td>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">31</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">নভেম্বর</div>
+                <div class="month-name-en">November</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">কার্তিক-অগ্রহায়ণ ১৪৩৩</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">জমাদিউল আউয়াল-জমাদিউল সানি ১৪৪৮</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">30</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="month-card">
+            <div class="month-header">
+                <div class="month-name-bn">ডিসেম্বর</div>
+                <div class="month-name-en">December</div>
+                <div class="sub-month-info">
+                   <div class="sub-month-row" style="color: var(--color-bangla);">অগ্রহায়ণ-পৌষ ১৪৩৩</div>
+                   <div class="sub-month-row" style="color: var(--color-hijri);">জমাদিউল সানি-রজব ১৪৪৮</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>রবি</th>
+                        <th>সোম</th>
+                        <th>মঙ্গল</th>
+                        <th>বুধ</th>
+                        <th>বৃহঃ</th>
+                        <th class="weekend">শুক্র</th>
+                        <th class="weekend">শনি</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td></td><td></td>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">1</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">2</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৮</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">3</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৯</span>
+                                <span class="hijri-date">22</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">4</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২০</span>
+                                <span class="hijri-date">23</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">5</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২১</span>
+                                <span class="hijri-date">24</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">6</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২২</span>
+                                <span class="hijri-date">25</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">7</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৩</span>
+                                <span class="hijri-date">26</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">8</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৪</span>
+                                <span class="hijri-date">27</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">9</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৫</span>
+                                <span class="hijri-date">28</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">10</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৬</span>
+                                <span class="hijri-date">29</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">11</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৭</span>
+                                <span class="hijri-date">1</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">12</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৮</span>
+                                <span class="hijri-date">2</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">13</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২৯</span>
+                                <span class="hijri-date">3</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">14</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩০</span>
+                                <span class="hijri-date">4</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">15</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১</span>
+                                <span class="hijri-date">5</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">16</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">২</span>
+                                <span class="hijri-date">6</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">17</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৩</span>
+                                <span class="hijri-date">7</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">18</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৪</span>
+                                <span class="hijri-date">8</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">19</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৫</span>
+                                <span class="hijri-date">9</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">20</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৬</span>
+                                <span class="hijri-date">10</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">21</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৭</span>
+                                <span class="hijri-date">11</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">22</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৮</span>
+                                <span class="hijri-date">12</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">23</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">৯</span>
+                                <span class="hijri-date">13</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">24</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১০</span>
+                                <span class="hijri-date">14</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">25</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১১</span>
+                                <span class="hijri-date">15</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="weekend-text">
+                        <div class="date-cell">
+                            <div class="gregorian">26</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১২</span>
+                                <span class="hijri-date">16</span>
+                            </div>
+                        </div>
+                    </td>
+                    </tr><tr>
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">27</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৩</span>
+                                <span class="hijri-date">17</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">28</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৪</span>
+                                <span class="hijri-date">18</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">29</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৫</span>
+                                <span class="hijri-date">19</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">30</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৬</span>
+                                <span class="hijri-date">20</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="">
+                        <div class="date-cell">
+                            <div class="gregorian">31</div>
+                            <div class="secondary-dates">
+                                <span class="bangla-date">১৭</span>
+                                <span class="hijri-date">21</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+</body>
+</html>
