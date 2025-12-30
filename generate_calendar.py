@@ -483,5 +483,5 @@ def generate_html():
 
 if __name__ == '__main__':
     content = generate_html()
-    with open('calendar_2026.html', 'w', encoding='utf-8') as f:
+    with open('index.html', 'w', encoding='utf-8') as f:
         f.write(content)
